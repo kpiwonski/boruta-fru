@@ -15,20 +15,30 @@ pub fn boruta(
     tries: usize,
     seed: u64,
     threads: Option<usize>,
-) -> {
-    let mut hits = vec![0usize; x.n_cols()];
+) -> impl Iterator<Item = (usize, HitAggregator)> {
     let mut rng = RfRng::from_seed(seed, 1);
 
-    let mut tentative: Vec<_> = (0..x.n_cols()).collect();
-    let mut confirmed = vec![];
-    let mut rejected: Vec<usize> = vec![];
+    let mut hits = vec![HitAggregator::new(); x.n_cols()];
 
     for run in 0..max_runs {
-        if tentative.len() == 0 {
+        let tentative_idxs: Vec<_> = hits
+            .iter()
+            .enumerate()
+            .filter(|(_, d)| d.decision == Decision::Tentative)
+            .map(|(i, _)| i)
+            .collect();
+
+        if tentative_idxs.len() == 0 {
             break;
         }
 
-        let idxs: Vec<_> = confirmed.iter().chain(tentative.iter()).copied().collect();
+        let idxs: Vec<_> = hits
+            .iter()
+            .enumerate()
+            .filter(|(_, d)| d.decision != Decision::Rejected)
+            .map(|(i, _)| i)
+            .collect();
+
         let mut xp = x.c(&*idxs).to_table();
         for i in 0..x.n_cols() {
             let mask = Mask::new_all(x.n_rows()).permute(&mut rng);
@@ -44,7 +54,7 @@ pub fn boruta(
             false,
             true,
             false,
-            seed, // TODO should be random int from rng
+            rng.get_u64(),
             threads,
         );
 
@@ -58,33 +68,64 @@ pub fn boruta(
 
         for (i, imp_val) in rf.importance_raw(true) {
             if i < idxs.len() && max_shadow_imp < imp_val {
-                hits[idxs[i]] += 1;
+                hits[idxs[i]].ingest_hit(true);
+            } else {
+                hits[idxs[i]].ingest_hit(false);
             }
         }
 
-        let mut tentative_new = vec![];
+        for &idx in tentative_idxs.iter() {
+            hits[idx].decide(tentative_idxs.len(), pval_th);
+        }
+    }
 
-        for &idx in tentative.iter() {
-            let h = hits[idx];
-            let pval_rej = binom_cdf(h as u64, run as u64, 0.5);
-            let mut moved = false;
+    hits.into_iter().enumerate()
+}
 
-            if pval_rej < pval_th / (tentative.len() as f64) {
-                rejected.push(idx);
-                moved = true;
-            }
-            if hits[idx] > 0 {
-                let pval_conf = binom_cdf((h - 1) as u64, run as u64, 0.5);
-                if pval_conf > 1. - pval_th / (tentative.len() as f64) {
-                    confirmed.push(idx.clone());
-                    moved = true;
-                }
-            }
+#[derive(Clone, Eq, PartialEq)]
+pub enum Decision {
+    Tentative,
+    Confirmed,
+    Rejected,
+}
 
-            if !moved {
-                tentative_new.push(idx);
+#[derive(Clone)]
+pub struct HitAggregator {
+    hits: usize,
+    tries: usize,
+    pub decision: Decision,
+}
+
+impl HitAggregator {
+    fn new() -> Self {
+        Self {
+            hits: 0,
+            tries: 0,
+            decision: Decision::Tentative,
+        }
+    }
+
+    fn decide(&mut self, tentative_num: usize, pval_th: f64) {
+        if self.decision != Decision::Tentative {
+            panic!("Cannot change decision when it is already confirmed or rejected");
+        }
+
+        let pval_rej = binom_cdf(self.hits as u64, self.tries as u64, 0.5);
+
+        if pval_rej < pval_th / (tentative_num as f64) {
+            self.decision = Decision::Rejected;
+        }
+
+        if self.hits > 0 {
+            let pval_conf = binom_cdf((self.hits - 1) as u64, self.tries as u64, 0.5);
+            if pval_conf > 1. - pval_th / (tentative_num as f64) {
+                self.decision = Decision::Confirmed;
             }
         }
-        tentative = tentative_new;
+    }
+
+    fn ingest_hit(&mut self, hitted: bool) {
+        self.hits += hitted as usize;
+        self.tries += 1;
     }
 }
