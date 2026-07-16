@@ -1,0 +1,11 @@
+[package]
+name = "boruta-arrow"
+version = "0.1.0"
+authors = ["Krzysztof Piwonski <fruarrow@kpiwonski.com>", "Miron B. Kursa <m@mbq.me>"]
+edition="2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+fru-arrow = "0.1.0"
+minarrow = "0.11.0"
+xrf = "0.1.7"

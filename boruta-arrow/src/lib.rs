@@ -67,10 +67,12 @@ pub fn boruta(
             .unwrap();
 
         for (i, imp_val) in rf.importance_raw(true) {
-            if i < idxs.len() && max_shadow_imp < imp_val {
-                hits[idxs[i]].ingest_hit(true);
-            } else {
-                hits[idxs[i]].ingest_hit(false);
+            if i < idxs.len() {
+                if max_shadow_imp < imp_val {
+                    hits[idxs[i]].ingest_hit(true);
+                } else {
+                    hits[idxs[i]].ingest_hit(false);
+                }
             }
         }
 

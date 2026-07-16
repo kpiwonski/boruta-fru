@@ -1,0 +1,19 @@
+[package]
+name = "pyboruta"
+version = "0.1.0"
+edition = "2024"
+
+
+[lib]
+name = "pyboruta"
+crate-type = ["cdylib"]
+
+[dependencies]
+minarrow-pyo3 = {version="=0.3.0", features=["extended_numeric_types", "extended_categorical"]}
+pyo3 = { version = "0.23", features = ["abi3-py38"] }
+boruta-arrow = {path="../boruta-arrow"} 
+minarrow = "0.11.0"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

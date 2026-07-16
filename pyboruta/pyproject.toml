@@ -1,0 +1,48 @@
+[project]
+name = "pyboruta"
+version = "0.1.0"
+license = "GPL-3.0-or-later"
+description = "Fast implementation of Boruta using pyfru"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.0.0",
+    "pyarrow>=23.0.1",
+]
+readme = "README.md"
+authors = [
+    { name = "Chris Piwonski", email = "borutaarrow@kpiwonski.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",    
+]
+
+[project.urls]
+repository = "https://github.com/kpiwonski/boruta-arrow"
+documentation = "https://kpiwonski.github.io/boruta-arrow/"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9",
+    "pandas>=3",
+    "furo>=2025.12.19",
+    "myst-parser>=5.1.0",
+    "ruff>=0.15.12",
+    "sphinx>=9.1.0",
+]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "python"
+module-name = "pyboruta._rust"
+features = ["pyo3/extension-module"]
