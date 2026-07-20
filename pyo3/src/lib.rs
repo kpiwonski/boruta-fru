@@ -58,7 +58,7 @@ mod pyfru {
         max_runs: usize,
         pval_th: f64,
         trees: usize,
-        tries: usize,
+        tries: Option<usize>,
         seed: u64,
         threads: Option<usize>,
     ) -> BorutaRes {
@@ -91,6 +91,7 @@ mod pyfru {
             _ => unreachable!("Unsupported decision type"),
         };
 
+        let tries = tries.unwrap_or((x_df.n_cols() as f64).sqrt().round() as usize);
         let mut res: Vec<_> = boruta_arrow::boruta(
             x_df, y_array, max_runs, pval_th, trees, tries, seed, threads,
         )
