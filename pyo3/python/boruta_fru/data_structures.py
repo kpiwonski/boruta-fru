@@ -18,4 +18,3 @@ class ResultTable:
 
     def _df_to_numpy(self):
         return self.obj[self.IMPORTANCE_COL].to_numpy(zero_copy_only=False)
-

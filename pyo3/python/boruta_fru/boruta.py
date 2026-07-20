@@ -6,6 +6,7 @@ from . import _rust
 
 PVAL_TH = 0.01
 
+
 class Boruta:
     """
     Boruta [1]_ model used for the feature selection.
@@ -53,6 +54,7 @@ class Boruta:
        Journal of Statistical Software, 36(11), p. 1-13.
        <https://doi.org/10.18637/jss.v036.i11>`_
     """
+
     def __init__(
         self,
         max_runs=100,
