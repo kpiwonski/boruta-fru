@@ -4,7 +4,10 @@ use pyo3::prelude::*;
 #[pyo3(name = "_rust")]
 mod pyfru {
     use boruta_arrow::Decision;
-    use minarrow::{Array, CategoricalArray, FieldArray, StringArray, Table};
+    use minarrow::{
+        Array, CategoricalArray, FieldArray, FloatArray, NumericArray, StringArray, Table,
+        TextArray,
+    };
     use minarrow_pyo3::{PyArray, PyRecordBatch};
     use pyo3::{pyclass, pyfunction, pymethods};
 
@@ -36,7 +39,7 @@ mod pyfru {
             );
 
             let colnames = FieldArray::from_arr(
-                "col_name",
+                "column",
                 Array::from_string64(StringArray::from_vec(
                     self.1.iter().map(|x| x.as_str()).collect::<Vec<_>>(),
                     None,
@@ -61,15 +64,35 @@ mod pyfru {
     ) -> BorutaRes {
         let x_df = x.into_inner();
         let col_names: Vec<_> = x_df.col_names().iter().map(|x| x.to_string()).collect();
+
+        let y_array: Array = match y.into_inner().array {
+            Array::TextArray(arr) => match arr {
+                TextArray::Categorical8(x) => Into::<CategoricalArray<u64>>::into(&*x),
+                TextArray::Categorical16(x) => Into::<CategoricalArray<u64>>::into(&*x),
+                TextArray::Categorical32(x) => Into::<CategoricalArray<u64>>::into(&*x),
+                TextArray::Categorical64(x) => (*x).clone(),
+                _ => unreachable!("Decision is not categorical"),
+            }
+            .into(),
+            Array::NumericArray(num) => match num {
+                NumericArray::Int8(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::Int16(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::Int32(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::Int64(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::UInt8(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::UInt16(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::UInt32(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::UInt64(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::Float32(x) => Into::<FloatArray<f64>>::into(&*x),
+                NumericArray::Float64(x) => (*x).clone(),
+                _ => unreachable!("Decision is not numeric"),
+            }
+            .into(),
+            _ => unreachable!("Unsupported decision type"),
+        };
+
         let mut res: Vec<_> = boruta_arrow::boruta(
-            x_df,
-            y.into_inner().array,
-            max_runs,
-            pval_th,
-            trees,
-            tries,
-            seed,
-            threads,
+            x_df, y_array, max_runs, pval_th, trees, tries, seed, threads,
         )
         .collect();
 
