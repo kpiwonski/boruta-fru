@@ -1,5 +1,5 @@
 [project]
-name = "pyboruta"
+name = "boruta-fru"
 version = "0.1.0"
 license = "GPL-3.0-or-later"
 description = "Fast implementation of Boruta using pyfru"
@@ -44,5 +44,5 @@ build-backend = "maturin"
 
 [tool.maturin]
 python-source = "python"
-module-name = "pyboruta._rust"
+module-name = "boruta_fru._rust"
 features = ["pyo3/extension-module"]

@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "boruta-arrow",
-    "pyboruta",
+    "pyo3",
 ]
 
 resolver = "3"
