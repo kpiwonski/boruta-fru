@@ -9,3 +9,6 @@ license = "GPL-3.0-or-later"
 fru-arrow = "0.1.0"
 minarrow = "0.11.0"
 xrf = "0.1.7"
+
+[dev-dependencies]
+float-cmp = "0.10.0"

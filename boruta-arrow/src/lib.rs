@@ -6,6 +6,7 @@ use xrf::{Mask, RfRng};
 
 use crate::binom::binom_cdf;
 
+#[allow(clippy::too_many_arguments)]
 pub fn boruta(
     x: Table,
     y: Array,
@@ -20,7 +21,7 @@ pub fn boruta(
 
     let mut hits = vec![HitAggregator::new(); x.n_cols()];
 
-    for run in 0..max_runs {
+    for _run in 0..max_runs {
         let tentative_idxs: Vec<_> = hits
             .iter()
             .enumerate()
@@ -28,7 +29,7 @@ pub fn boruta(
             .map(|(i, _)| i)
             .collect();
 
-        if tentative_idxs.len() == 0 {
+        if tentative_idxs.is_empty() {
             break;
         }
 

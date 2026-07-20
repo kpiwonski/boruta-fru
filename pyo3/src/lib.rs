@@ -50,6 +50,7 @@ mod pyfru {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     #[pyfunction]
     #[pyo3(signature = (x, y, max_runs, pval_th, trees, tries, seed, threads=None))]
     pub fn boruta(
