@@ -1,4 +1,4 @@
 target/
 __pycache__/
 *.so
-pyo3//python/docs/_build/
+pyo3/python/docs/_build/
