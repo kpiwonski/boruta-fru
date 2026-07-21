@@ -9,16 +9,15 @@ The Python version of boruta-fru is available as ``boruta-fru`` on PyPI.
 Use your favorite package manager to install it.
 The package requires ``python >= 3.12``.
 
-For this tutorial, you will also need ``scikit-learn``,` ``pandas`` and ``polars``.
+For this tutorial, you will also need ``scikit-learn``, ``pandas`` and ``polars``.
 
 Basic usage example
 -------------------
-You can initialize a model and use ``fit`` and ``final_decision`` functions.
-``fit`` is used for performing a feature selection.
-After performing ``fit``, ``final_decision`` reutrns decision for each feature.
-The model takes ``max_runs`` parameter on initialization. If there are many
-``Tentative`` decisions, increasing this parameter may help.
-Moreover, increasing ``trees`` may be helpful to increase the quality of decisions. 
+You can initialize a model and use the ``fit`` and ``final_decision`` functions.
+The fit function is used to perform feature selection. After running ``fit```, the ``final_decision``
+function returns a decision for each feature. The model accepts a ``max_runs`` parameter during initialization.
+If there are many ``Tentative`` decisions, increasing this parameter may help.
+Additionally, increasing the number of ``trees`` may improve the quality of the decisions.
 
 .. warning::
     Pandas fully supports the PyCapsule interface starting from version 3.
@@ -50,12 +49,12 @@ Moreover, increasing ``trees`` may be helpful to increase the quality of decisio
     # make predictions
     boruta.final_decision()
 
-The result of ``final_decision`` will be an array with a decision for each column
-from our original data frame.
+The result of ``final_decision`` is an array containing a decision for each column in the original data frame.
 
-- ``Confirmed`` means the feature was accepted as important for prediction
-- ``Rejected`` means the feature was rejected being important for prediction
-- ``Tentative`` means the feature was neither rejected nor confirmed. Hence, it is unknown if the feature should be considered as important for prediction.
+- ``Confirmed``` means the feature was accepted as important for prediction.
+- ``Rejected`` means the feature was determined not to be important for prediction.
+- ``Tentative`` means the feature was neither rejected nor confirmed; therefore, it is unclear whether the feature should be considered important for prediction.
+
 
 Polars example
 --------------

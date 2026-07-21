@@ -14,9 +14,9 @@ class Boruta:
     Parameters
     ----------
     max_runs : int
-        Maximal number of the model iterations. If all features are resolved as
-        confirmed or rejected, the model witll stop earlier. If there are
-        tentative features, you may consider increasing this parameter.
+        Maximum number of model iterations. If all features are resolved as
+        confirmed or rejected, the model will stop early. If there are
+        tentative features remaining, consider increasing this parameter.
         Defaults to 100.
     trees : int
         Number of trees to grow in the forest (often called ``ntree`` in other
