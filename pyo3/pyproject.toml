@@ -11,6 +11,7 @@ dependencies = [
 readme = "README.md"
 authors = [
     { name = "Chris Piwonski", email = "borutaarrow@kpiwonski.com" },
+    { name = "Miron B. Kursa", email = "m@mbq.me" },
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
