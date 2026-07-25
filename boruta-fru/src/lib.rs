@@ -1,6 +1,7 @@
 mod binom;
 
 use fru_arrow::RandomForest;
+use log::info;
 use minarrow::{Array, ColumnSelection, FieldArray, RowSelection, Table};
 use xrf::{Mask, RfRng};
 
@@ -26,7 +27,7 @@ pub fn boruta(
         panic!("NA values are not supported without imputation");
     }
 
-    for _run in 0..max_runs {
+    for run in 0..max_runs {
         let tentative_idxs: Vec<_> = hits
             .iter()
             .enumerate()
@@ -37,6 +38,19 @@ pub fn boruta(
         if tentative_idxs.is_empty() {
             break;
         }
+
+        info!(
+            "Boruta iteration: {run}/{max_runs}. Tentative: {} Rejected: {} Confirmed: {}",
+            hits.iter()
+                .filter(|h| h.decision == Decision::Tentative)
+                .count(),
+            hits.iter()
+                .filter(|h| h.decision == Decision::Rejected)
+                .count(),
+            hits.iter()
+                .filter(|h| h.decision == Decision::Confirmed)
+                .count()
+        );
 
         let idxs: Vec<_> = hits
             .iter()

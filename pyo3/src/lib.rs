@@ -4,6 +4,7 @@ use pyo3::prelude::*;
 #[pyo3(name = "_rust")]
 mod pyfru {
     use boruta_fru::Decision;
+    use env_logger::Env;
     use minarrow::{
         Array, CategoricalArray, FieldArray, FloatArray, NumericArray, StringArray, Table,
         TextArray,
@@ -56,7 +57,7 @@ mod pyfru {
 
     #[allow(clippy::too_many_arguments)]
     #[pyfunction]
-    #[pyo3(signature = (x, y, max_runs, pval_th, trees, tries, impute, seed, threads=None))]
+    #[pyo3(signature = (x, y, max_runs, pval_th, trees, tries, impute, log_level, seed, threads=None))]
     pub fn boruta(
         x: PyRecordBatch,
         y: PyArray,
@@ -65,9 +66,11 @@ mod pyfru {
         trees: usize,
         tries: Option<usize>,
         impute: bool,
+        log_level: String,
         seed: u64,
         threads: Option<usize>,
     ) -> BorutaRes {
+        env_logger::Builder::from_env(Env::default().default_filter_or(log_level)).init();
         let x_df = x.into_inner();
         let col_names: Vec<_> = x_df.col_names().iter().map(|x| x.to_string()).collect();
 
