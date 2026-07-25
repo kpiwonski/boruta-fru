@@ -34,11 +34,6 @@ class Boruta:
         Whether missing values should be imputed. This way, in each run the imputed
         value would be different. This applies also to shadows created from the
         columns. Defaults to True.
-    log_level : str
-        Logging level used by the model. Can be either "info" or "error".
-        If set to "info", Boruta progress will be displayed.
-        This can also be configured via the ``RUST_LOG`` environment variable,
-        which takes precedence over this argument. Defaults to ``"error"``.
     seed : int | None
         Seed used by the algorithm. Set to ``None`` to use a random seed.
     threads : int | None
@@ -70,7 +65,6 @@ class Boruta:
         trees=500,
         tries=None,
         impute=True,
-        log_level="error",
         seed=None,
         threads=None,
     ):
@@ -81,9 +75,6 @@ class Boruta:
         self.impute = impute
         self.seed = seed
         self.threads = threads
-        if log_level not in ["error", "info"]:
-            raise ValueError("Incorrect log_level parameter")
-        self.log_level = log_level
 
     def fit(self, X, y):
         """
@@ -114,7 +105,6 @@ class Boruta:
             self.trees,
             self.tries,
             self.impute,
-            self.log_level,
             self._get_seed(),
             self.threads,
         )
