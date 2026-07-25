@@ -14,12 +14,17 @@ pub fn boruta(
     pval_th: f64,
     trees: usize,
     tries: usize,
+    impute: bool,
     seed: u64,
     threads: Option<usize>,
 ) -> impl Iterator<Item = (usize, HitAggregator)> {
     let mut rng = RfRng::from_seed(seed, 1);
 
     let mut hits = vec![HitAggregator::new(); x.n_cols()];
+
+    if !impute && x.cols.iter().map(|col| col.array.has_nulls()).any(|x| x) {
+        panic!("NA values are not supported without imputation");
+    }
 
     for _run in 0..max_runs {
         let tentative_idxs: Vec<_> = hits
@@ -40,10 +45,45 @@ pub fn boruta(
             .map(|(i, _)| i)
             .collect();
 
+        // Create table only with confirmed and tentative cols
         let mut xp = x.c(&*idxs).to_table();
-        for i in 0..x.n_cols() {
-            let mask = Mask::new_all(x.n_rows()).permute(&mut rng);
-            let fa = FieldArray::from_arr("__shadow__", x.cols[i].r(&*mask).to_array()); // TODO name
+
+        // Impute nan values
+        if impute {
+            for col in &mut xp.cols {
+                if col.array.has_nulls() {
+                    let vals = (0..col.array.len())
+                        .into_iter()
+                        .map(|i| col.array.get_scalar(i));
+                    let not_null_vals: Vec<_> = vals
+                        .clone()
+                        .filter_map(|opt| opt.filter(|x| !matches!(x, minarrow::Scalar::Null)))
+                        .collect();
+                    let null_idxs: Vec<usize> = vals
+                        .enumerate()
+                        .filter_map(|(i, opt)| {
+                            matches!(opt, Some(minarrow::Scalar::Null)).then_some(i)
+                        })
+                        .collect();
+                    for idx in null_idxs {
+                        let val = not_null_vals[rng.up_to(not_null_vals.len())].clone();
+                        col.array.set(idx, val).unwrap();
+                        col.refresh_null_count();
+                    }
+                }
+            }
+        }
+
+        // Add shadow columns
+        let mut num_shadow = xp.n_cols();
+        while num_shadow < 5 {
+            num_shadow *= 2;
+        }
+
+        for i in 0..num_shadow {
+            let mask = Mask::new_all(xp.n_rows()).permute(&mut rng);
+            let fa =
+                FieldArray::from_arr("__shadow__", xp.cols[i % xp.n_cols()].r(&*mask).to_array()); // TODO name
             xp.add_col(fa);
         }
 
