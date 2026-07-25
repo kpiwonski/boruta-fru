@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "boruta-arrow",
+    "boruta-fru",
     "pyo3",
 ]
 
