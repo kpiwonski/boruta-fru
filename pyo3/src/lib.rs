@@ -3,7 +3,7 @@ use pyo3::prelude::*;
 #[pymodule(gil_used = false)]
 #[pyo3(name = "_rust")]
 mod pyfru {
-    use boruta_arrow::Decision;
+    use boruta_fru::Decision;
     use minarrow::{
         Array, CategoricalArray, FieldArray, FloatArray, NumericArray, StringArray, Table,
         TextArray,
@@ -12,7 +12,7 @@ mod pyfru {
     use pyo3::{pyclass, pyfunction, pymethods};
 
     #[pyclass]
-    pub struct BorutaRes(Vec<boruta_arrow::HitAggregator>, Vec<String>);
+    pub struct BorutaRes(Vec<boruta_fru::HitAggregator>, Vec<String>);
 
     #[pymethods]
     impl BorutaRes {
@@ -98,7 +98,7 @@ mod pyfru {
         };
 
         let tries = tries.unwrap_or((x_df.n_cols() as f64).sqrt().round() as usize);
-        let mut res: Vec<_> = boruta_arrow::boruta(
+        let mut res: Vec<_> = boruta_fru::boruta(
             x_df, y_array, max_runs, pval_th, trees, tries, impute, seed, threads,
         )
         .collect();
