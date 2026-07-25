@@ -30,6 +30,10 @@ class Boruta:
         By default, it is set to the rounded square root of the number of features.
         Higher values increase correlation between trees. In most cases, the default
         setting is recommended.
+    impute : bool
+        Whether missing values should be imputed. This way, in each run the imputed
+        value would be different. This applies also to shadows created from the
+        columns. Defaults to True.
     seed : int | None
         Seed used by the algorithm. Set to ``None`` to use a random seed.
     threads : int | None
@@ -60,6 +64,7 @@ class Boruta:
         max_runs=100,
         trees=500,
         tries=None,
+        impute=True,
         seed=None,
         threads=None,
     ):
@@ -67,6 +72,7 @@ class Boruta:
         self.pval_th = PVAL_TH
         self.trees = trees
         self.tries = tries
+        self.impute = impute
         self.seed = seed
         self.threads = threads
 
@@ -98,6 +104,7 @@ class Boruta:
             self.pval_th,
             self.trees,
             self.tries,
+            self.impute,
             self._get_seed(),
             self.threads,
         )

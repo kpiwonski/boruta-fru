@@ -46,13 +46,17 @@ mod pyfru {
                 )),
             );
 
-            Table::new("final_decision".into(), vec![colnames, decision].into()).into()
+            Table::new(
+                "final_decision".to_string(),
+                vec![colnames, decision].into(),
+            )
+            .into()
         }
     }
 
     #[allow(clippy::too_many_arguments)]
     #[pyfunction]
-    #[pyo3(signature = (x, y, max_runs, pval_th, trees, tries, seed, threads=None))]
+    #[pyo3(signature = (x, y, max_runs, pval_th, trees, tries, impute, seed, threads=None))]
     pub fn boruta(
         x: PyRecordBatch,
         y: PyArray,
@@ -60,6 +64,7 @@ mod pyfru {
         pval_th: f64,
         trees: usize,
         tries: Option<usize>,
+        impute: bool,
         seed: u64,
         threads: Option<usize>,
     ) -> BorutaRes {
@@ -94,7 +99,7 @@ mod pyfru {
 
         let tries = tries.unwrap_or((x_df.n_cols() as f64).sqrt().round() as usize);
         let mut res: Vec<_> = boruta_arrow::boruta(
-            x_df, y_array, max_runs, pval_th, trees, tries, seed, threads,
+            x_df, y_array, max_runs, pval_th, trees, tries, impute, seed, threads,
         )
         .collect();
 
