@@ -125,6 +125,7 @@ pub fn boruta(
                         })
                         .collect();
 
+                    // If column contain only null values, use instead a boolean column with all false values
                     if not_null_vals.is_empty() {
                         let arr = FieldArray::from_arr(
                             &*col.field.name,
