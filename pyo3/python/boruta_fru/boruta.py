@@ -37,6 +37,10 @@ class Boruta:
         from the non-null values in the same column. Imputation is performed before
         each run of the forest, so sampled values may differ between runs.
         If ``False``, the presence of any missing values will raise an error.
+        An all-null column will be converted to a boolean column with false values,
+        which should be ok as a totally non-informative value with most methods,
+        but it is not universally correct. Ideally, one should avoid having such
+        features in input altogether.
     seed : int | None
         Seed used by the algorithm. Set to ``None`` to use a random seed.
     threads : int | None

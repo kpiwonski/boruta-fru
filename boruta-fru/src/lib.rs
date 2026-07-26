@@ -28,6 +28,10 @@ use crate::binom::binom_cdf;
 /// - If `true`, missing values are imputed by randomly sampling (with replacement)
 ///   from the non-null values in the same column. Imputation is performed before every
 ///   run of the forest, so the sampled values may differ each time.
+///   An all-null column will be converted to a boolean column with false values,
+///   which should be ok as a totally non-informative value with most methods,
+///   but it is not universally correct. Ideally, one should avoid having such
+///   features in input altogether.
 /// - If `false`, the presence of any missing values will cause the code to panic.
 /// * `seed` - Random seed used by the algorithm.
 /// * `threads` - Number of threads to use. Must be greater than zero.
