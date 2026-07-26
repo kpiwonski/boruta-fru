@@ -5,7 +5,7 @@ mod binom;
 
 use fru_arrow::RandomForest;
 use log::info;
-use minarrow::{Array, ColumnSelection, FieldArray, RowSelection, Table};
+use minarrow::{Array, BooleanArray, ColumnSelection, FieldArray, RowSelection, Table};
 use xrf::{Mask, RfRng};
 
 use crate::binom::binom_cdf;
@@ -28,6 +28,10 @@ use crate::binom::binom_cdf;
 /// - If `true`, missing values are imputed by randomly sampling (with replacement)
 ///   from the non-null values in the same column. Imputation is performed before every
 ///   run of the forest, so the sampled values may differ each time.
+///   An all-null column will be converted to a boolean column with false values,
+///   which should be ok as a totally non-informative value with most methods,
+///   but it is not universally correct. Ideally, one should avoid having such
+///   features in input altogether.
 /// - If `false`, the presence of any missing values will cause the code to panic.
 /// * `seed` - Random seed used by the algorithm.
 /// * `threads` - Number of threads to use. Must be greater than zero.
@@ -59,13 +63,17 @@ pub fn boruta(
     seed: u64,
     threads: Option<usize>,
 ) -> impl Iterator<Item = (usize, HitAggregator)> {
-    let mut rng = RfRng::from_seed(seed, 1);
-
-    let mut hits = vec![HitAggregator::new(); x.n_cols()];
+    if x.n_rows() == 0 {
+        panic!("Data frame cannot be empty")
+    }
 
     if !impute && x.cols.iter().any(|col| col.array.has_nulls()) {
         panic!("NA values are not supported without imputation");
     }
+
+    let mut rng = RfRng::from_seed(seed, 1);
+
+    let mut hits = vec![HitAggregator::new(); x.n_cols()];
 
     for run in 0..max_runs {
         let tentative_idxs: Vec<_> = hits
@@ -104,7 +112,8 @@ pub fn boruta(
 
         // Impute nan values
         if impute {
-            for col in &mut xp.cols {
+            for idx in 0..xp.n_cols() {
+                let col = &mut xp.cols[idx];
                 if col.array.has_nulls() {
                     let vals = (0..col.array.len())
                         .into_iter()
@@ -119,6 +128,19 @@ pub fn boruta(
                             matches!(opt, Some(minarrow::Scalar::Null)).then_some(i)
                         })
                         .collect();
+
+                    // If column contain only null values, use instead a boolean column with all false values
+                    if not_null_vals.is_empty() {
+                        let arr = FieldArray::from_arr(
+                            &*col.field.name,
+                            Array::from_bool(BooleanArray::from_slice(
+                                vec![false; col.len()].as_slice(),
+                            )),
+                        );
+                        xp.cols[idx] = arr;
+                        continue;
+                    }
+
                     for idx in null_idxs {
                         let val = not_null_vals[rng.up_to(not_null_vals.len())].clone();
                         col.array.set(idx, val).unwrap();
