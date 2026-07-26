@@ -5,7 +5,7 @@ mod binom;
 
 use fru_arrow::RandomForest;
 use log::info;
-use minarrow::{Array, ColumnSelection, FieldArray, RowSelection, Table};
+use minarrow::{Array, BooleanArray, ColumnSelection, FieldArray, RowSelection, Table};
 use xrf::{Mask, RfRng};
 
 use crate::binom::binom_cdf;
@@ -104,7 +104,8 @@ pub fn boruta(
 
         // Impute nan values
         if impute {
-            for col in &mut xp.cols {
+            for idx in 0..xp.n_cols() {
+                let col = &mut xp.cols[idx];
                 if col.array.has_nulls() {
                     let vals = (0..col.array.len())
                         .into_iter()
@@ -119,6 +120,18 @@ pub fn boruta(
                             matches!(opt, Some(minarrow::Scalar::Null)).then_some(i)
                         })
                         .collect();
+
+                    if not_null_vals.is_empty() {
+                        let arr = FieldArray::from_arr(
+                            &*col.field.name,
+                            Array::from_bool(BooleanArray::from_slice(
+                                vec![false; col.len()].as_slice(),
+                            )),
+                        );
+                        xp.cols[idx] = arr;
+                        continue;
+                    }
+
                     for idx in null_idxs {
                         let val = not_null_vals[rng.up_to(not_null_vals.len())].clone();
                         col.array.set(idx, val).unwrap();

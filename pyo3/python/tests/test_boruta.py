@@ -35,6 +35,21 @@ def table_0_1_10ft_with_nan(rng):
     y = pd.Series(y)
     return (df, y)
 
+@pytest.fixture
+def table_0_1_10ft_with_nan_col(rng):
+    # Generate random 0s and 1s
+    num_rows = 100
+    num_cols = 10
+    data = {f"col{i + 1}": rng.integers(0, 2, size=num_rows) for i in range(num_cols)}
+    df = pd.DataFrame(data)
+    # df.iloc[:, 1] = df.iloc[:, 1].astype(float)    
+    col = df.columns[1]
+    df[col] = np.nan
+    y = pd.Categorical(df.iloc[:, 0], categories=[0, 1], ordered=False)
+    y = y.rename_categories({0: "No", 1: "Yes"})
+    y = pd.Series(y)
+    return (df, y)
+
 
 def test_boruta_x0(table_0_1_10ft):
     b = boruta_fru.Boruta(tries=3, seed=0)
@@ -75,5 +90,11 @@ def test_rf_cls_0_1_3ft_imp_pycapsule(table_0_1_10ft):
 def test_boruta_x0_with_nan(table_0_1_10ft_with_nan):
     b = boruta_fru.Boruta(tries=3, seed=0)
     b.fit(table_0_1_10ft_with_nan[0], table_0_1_10ft_with_nan[1])
+    assert b.final_decision()[0] == "Confirmed"
+    assert all(np.isin(b.final_decision()[1:], ["Rejected", "Tentative"]))
+
+def test_boruta_x0_with_nan_col(table_0_1_10ft_with_nan_col):
+    b = boruta_fru.Boruta(tries=3, seed=0)
+    b.fit(table_0_1_10ft_with_nan_col[0], table_0_1_10ft_with_nan_col[1])
     assert b.final_decision()[0] == "Confirmed"
     assert all(np.isin(b.final_decision()[1:], ["Rejected", "Tentative"]))
