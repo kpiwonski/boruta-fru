@@ -63,13 +63,17 @@ pub fn boruta(
     seed: u64,
     threads: Option<usize>,
 ) -> impl Iterator<Item = (usize, HitAggregator)> {
-    let mut rng = RfRng::from_seed(seed, 1);
-
-    let mut hits = vec![HitAggregator::new(); x.n_cols()];
+    if x.n_rows() == 0 {
+        panic!("Data frame cannot be empty")
+    }
 
     if !impute && x.cols.iter().any(|col| col.array.has_nulls()) {
         panic!("NA values are not supported without imputation");
     }
+
+    let mut rng = RfRng::from_seed(seed, 1);
+
+    let mut hits = vec![HitAggregator::new(); x.n_cols()];
 
     for run in 0..max_runs {
         let tentative_idxs: Vec<_> = hits
