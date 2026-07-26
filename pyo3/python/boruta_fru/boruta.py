@@ -2,6 +2,7 @@ import secrets
 import sys
 
 from boruta_fru.data_structures import ResultTable
+
 from . import _rust
 
 PVAL_TH = 0.01

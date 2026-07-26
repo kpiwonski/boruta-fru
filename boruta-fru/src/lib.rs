@@ -16,18 +16,18 @@ use crate::binom::binom_cdf;
 /// * `x` - minarrow `Table`.
 /// * `y` - minarrow `Array`.
 /// * `max_runs` - Maximum number of model iterations.
-/// The process may stop early if all features are resolved as either confirmed or rejected.
-/// If some features remain tentative, consider increasing this value.
+///   The process may stop early if all features are resolved as either confirmed or rejected.
+///   If some features remain tentative, consider increasing this value.
 /// * `pval_th` - Significance threshold (p-value).
-/// The default value of 0.01 is recommended.
+///   The default value of 0.01 is recommended.
 /// * `trees` - Number of trees in the forest.
 /// * `tries` - Number of features to try at each split (often called `mtry`).
 ///   Must be greater than zero and less than or equal to the number of features.
 ///   A common default is the square root of the number of columns.
 /// * `impute` - Controls how missing values are handled.
 /// - If `true`, missing values are imputed by randomly sampling (with replacement)
-/// from the non-null values in the same column. Imputation is performed before every
-/// run of the forest, so the sampled values may differ each time.
+///   from the non-null values in the same column. Imputation is performed before every
+///   run of the forest, so the sampled values may differ each time.
 /// - If `false`, the presence of any missing values will cause the code to panic.
 /// * `seed` - Random seed used by the algorithm.
 /// * `threads` - Number of threads to use. Must be greater than zero.
@@ -63,7 +63,7 @@ pub fn boruta(
 
     let mut hits = vec![HitAggregator::new(); x.n_cols()];
 
-    if !impute && x.cols.iter().map(|col| col.array.has_nulls()).any(|x| x) {
+    if !impute && x.cols.iter().any(|col| col.array.has_nulls()) {
         panic!("NA values are not supported without imputation");
     }
 
