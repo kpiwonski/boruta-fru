@@ -87,6 +87,75 @@ such as ``pandas``, ``polars``, ``pyarrow``, ``duckdb``, and others.
     # make predictions
     boruta.final_decision()
 
+
+Missing values
+--------------
+
+``boruta-fru`` supports missing values. By default, in each iteration the algorithm
+imputes missing entries by randomly sampling (with replacement) from the non-null
+values in the same column.
+
+To disable this behavior, set ``impute=False``.
+
+.. code-block:: python
+
+    import pandas as pd
+
+    from sklearn.datasets import load_breast_cancer
+    from boruta_fru import Boruta
+    
+    # load data
+    data = load_breast_cancer(as_frame=True)
+    x = data["data"]
+    x.iloc[0, 0] = pd.NA
+	
+    # convert target to a categorical series with string categories
+    y = data["target"].astype(str).astype("category")
+	
+    # create model instance
+    boruta = Boruta(max_runs=200, trees=100)
+
+    # fit model
+    boruta.fit(data["data"], y)
+
+    # make predictions
+    boruta.final_decision()
+
+
+Progress
+--------
+The package provides progress reporting via logging. After each iteration, a log
+message is emitted containing the iteration number and the counts of
+``Tentative``, ``Rejected``, and ``Confirmed`` features.To enable logging,
+you just need to change log level to info.
+
+.. code-block:: python
+
+    import logging
+    
+    from sklearn.datasets import load_breast_cancer
+    from boruta_fru import Boruta
+    
+    # load data
+    data = load_breast_cancer(as_frame=True)
+	
+    # convert target to a categorical series with string categories
+    y = data["target"].astype(str).astype("category")
+	
+    # create model instance
+    boruta = Boruta(max_runs=200, trees=100)
+
+    # configure logging
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+    
+    # fit model
+    boruta.fit(data["data"], y)
+
+    # make predictions
+    boruta.final_decision()
+
+
 Result as PyCapsule (optional)
 ------------------------------
 Results can optionally be returned as an Arrow PyCapsule. This allows them to be

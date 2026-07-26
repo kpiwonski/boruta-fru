@@ -31,9 +31,11 @@ class Boruta:
         Higher values increase correlation between trees. In most cases, the default
         setting is recommended.
     impute : bool
-        Whether missing values should be imputed. This way, in each run the imputed
-        value would be different. This applies also to shadows created from the
-        columns. Defaults to True.
+        Controls how missing values are handled.
+        If ``True``, missing values are imputed by randomly sampling (with replacement)
+        from the non-null values in the same column. Imputation is performed before
+        each run of the forest, so sampled values may differ between runs.
+        If ``False``, the presence of any missing values will raise an error.
     seed : int | None
         Seed used by the algorithm. Set to ``None`` to use a random seed.
     threads : int | None

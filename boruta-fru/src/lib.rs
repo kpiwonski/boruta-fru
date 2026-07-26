@@ -1,3 +1,6 @@
+//! Boruta-fru is an implementation of the Boruta algorithm for feature selection.
+//! It leverages the `fru-arrow` Random Forest implementation to provide
+//! fast computation of permutation-based feature importance.
 mod binom;
 
 use fru_arrow::RandomForest;
@@ -7,6 +10,43 @@ use xrf::{Mask, RfRng};
 
 use crate::binom::binom_cdf;
 
+/// Main function for running the Boruta algorithm.
+///
+/// # Arguments
+/// * `x` - minarrow `Table`.
+/// * `y` - minarrow `Array`.
+/// * `max_runs` - Maximum number of model iterations.
+/// The process may stop early if all features are resolved as either confirmed or rejected.
+/// If some features remain tentative, consider increasing this value.
+/// * `pval_th` - Significance threshold (p-value).
+/// The default value of 0.01 is recommended.
+/// * `trees` - Number of trees in the forest.
+/// * `tries` - Number of features to try at each split (often called `mtry`).
+///   Must be greater than zero and less than or equal to the number of features.
+///   A common default is the square root of the number of columns.
+/// * `impute` - Controls how missing values are handled.
+/// - If `true`, missing values are imputed by randomly sampling (with replacement)
+/// from the non-null values in the same column. Imputation is performed before every
+/// run of the forest, so the sampled values may differ each time.
+/// - If `false`, the presence of any missing values will cause the code to panic.
+/// * `seed` - Random seed used by the algorithm.
+/// * `threads` - Number of threads to use. Must be greater than zero.
+///   If `None`, all available CPU cores are used.
+///
+/// # Returns
+/// An iterator over tuples `(usize, HitAggregator)`.
+/// The first element is the index of the column.
+/// The second element is an aggregator containing the model's decision.
+///
+/// # Notes
+/// Boruta iteratively compares importances of attributes with importances of
+/// shadow attributes, created by shuffling original ones. Attributes that have
+/// significantly worst importance than shadow ones are being consecutively
+/// dropped. On the other hand, attributes that are significantly better than shadows
+/// are admitted to be Confirmed. Shadows are re-created in each iteration.
+/// Algorithm stops when only Confirmed attributes are left, or when it reaches
+/// max_runs importance source runs. If the second scenario occurs, some attributes
+/// may be left without a decision. They are claimed Tentative.
 #[allow(clippy::too_many_arguments)]
 pub fn boruta(
     x: Table,
@@ -139,6 +179,10 @@ pub fn boruta(
     hits.into_iter().enumerate()
 }
 
+/// The decision enum. Can be one of:
+/// * `Tentative`
+/// * `Confirmed`
+/// * `Rejected`
 #[derive(Clone, Eq, PartialEq)]
 pub enum Decision {
     Tentative,
@@ -146,6 +190,8 @@ pub enum Decision {
     Rejected,
 }
 
+/// The `HitAggregator` provides model results.
+/// Currently only `decision` attribute is available.
 #[derive(Clone)]
 pub struct HitAggregator {
     hits: usize,
