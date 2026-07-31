@@ -1,27 +1,43 @@
 # Boruta Fru
 
 Boruta-fru is a canonical implementation of the [Boruta](iwww.jstatsoft.org/article/view/v036i11)
-all-relevant feature selection  algorithm.
+all-relevant feature selection algorithm for Python.
 This package is coauthored by the original [R package](https://cran.r-project.org/web/packages/Boruta/index.html)
-author Miron Kursa, so the package resambles original implementation as close as possible.
-It uses Arrow PyCapsule underneath, making integration with any library that supports
-it - ``polars``, ``pandas``, ``pyarrow`` straightforward.
-Thanks to our improvements in the [fru](github.com/kpiwonski/fru-arrow) Random Forest package, this package uses
-efficient permutation importance calculation.
+author Miron Kursa, with a goal to resemble the original implementation as close as possible.
+
+Boruta-fru is built around [fru](github.com/kpiwonski/fru-arrow), a scalable Random Forest implementation featuring a novel, highly-optimised algorithm for calculating permutational importance; this way it doesn't need to compromise on using Gini importance for speed.
+By using the Arrow PyCapsule underneath, it flawlessly integrates with any data frame library support it; that includes ``polars``, ``pandas`` and ``pyarrow``.
+
+
+## What is Boruta?
+
+Boruta works in a standard supervised learning setup; it expects a data set of observations described by numeric or categorical features and a single decision, and aims to find a subset of features that are relevant to the decision.
+This is achieved using Random Forest importance as a relevance proxy and adding synthetic irrelevant features, *shadows*, as a base for iteratively applied permutational test.
+
+Thanks to this construction, Boruta is an all relevant method, i.e., it doesn't remove remove weakly relevant (redundant) features, which is crucial for interpretability, but it is also more stable and allows for building more robust models.
+
 
 ## Boruta-fru versus borutapy
 
-The main difference between boruta-fru and borutapy is its speed. 
-borutapy uses scikit version of Random Forest underneath, while boruta-fru uses efficient implementation
-from the fru Random Forest package.
-Boruta-fru is typically anywhere from a few time to several thousand times faster than borutapy.
+Borutapy is a first implementation of Boruta for Python, and is a part of scikit-learn contrib.
+While this implementation uses the scikit version of Random Forest, it inherits its mediocre computational efficiency.
+This way, Boruta-fru can substantially outperform it, being typically anywhere from a few time to several thousand times faster.
 The plot below illustrates this difference for 2 datasets.
 
+TODO PLOTS
 
+Moreover, borutapy introduces several differences from the R package that may influence the results; boruta-fru follows the R package in these regards.
+In particular, boruta-py:
+- uses Gini importance, while it should default to permutation importance;
+- uses FDR correction by default, while it should apply Bonferroni correction;
+- reports only confirmed features, while it should be also possible to distinguish between tentative and rejected ones;
+- uses 0.05 default p-value cutoff, while it should use 0.01.
 
+## Boruta-fru versus R Boruta
 
-Most other differences between borutapy and boruta-fru boils down to implementation details:
-- borutapy uses impurity importance, while boruta-fru uses permutation importance
-- borutapy uses by default FDR correcation, while boruta-fru uses Bonferoni correction
-- borutapy is concentrated on confirming features. It is not possible to distinguish between tentative and rejected with borutapy.
-- borutapy uses by default 0.05 pvalue, while boruta-fru uses 0.01
+As mentioned before, Boruta-fru was made to be as compatible with the R package as possible; still, there are some caveats.
+Both implementations are based on fru, but it is tightly integrated Boruta-fru, while it can be swapped with other implementations in R Boruta.
+Following this, Boruta-fru has no support for transdapters; the functionality of the most popular one, impute transdapter that allows for processing data with missing values, is implemented via the ``impute`` flag.
+
+Due to a fact that Boruta is a stochastic algorithm and differences in how random seeds are handled in Python and R, it is not possible to exactly reproduce R result with Python and vice-versa, even with common random seeds.
+The results should be asymptotically identical, though.
