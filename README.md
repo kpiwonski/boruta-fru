@@ -1,12 +1,18 @@
 # Boruta Fru
 
+[![PyPI Version](https://img.shields.io/pypi/v/boruta-fru)](https://pypi.org/project/boruta-fru/)
+[![Crates.io Version](https://img.shields.io/crates/v/boruta-fru)](https://crates.io/crates/boruta-fru)
+
+[Boruta-fru docs](https://kpiwonski.github.io/boruta-fru/) |
+[R version](https://cran.r-project.org/web/packages/Boruta/index.html)
+
 Boruta-fru is a canonical implementation of the [Boruta](iwww.jstatsoft.org/article/view/v036i11)
 all-relevant feature selection algorithm for Python.
 This package is coauthored by the original [R package](https://cran.r-project.org/web/packages/Boruta/index.html)
 author Miron Kursa, with a goal to resemble the original implementation as close as possible.
 
 Boruta-fru is built around [fru](github.com/kpiwonski/fru-arrow), a scalable Random Forest implementation featuring a novel, highly-optimised algorithm for calculating permutational importance; this way it doesn't need to compromise on using Gini importance for speed.
-By using the Arrow PyCapsule underneath, it flawlessly integrates with any data frame library support it; that includes ``polars``, ``pandas`` and ``pyarrow``.
+By using the Arrow PyCapsule underneath, it flawlessly integrates with any data frame library that supports it; that includes ``polars``, ``pandas`` and ``pyarrow``.
 
 
 ## What is Boruta?
@@ -19,19 +25,21 @@ Thanks to this construction, Boruta is an all relevant method, i.e., it doesn't 
 
 ## Boruta-fru versus borutapy
 
-Borutapy is a first implementation of Boruta for Python, and is a part of scikit-learn contrib.
-While this implementation uses the scikit version of Random Forest, it inherits its mediocre computational efficiency.
-This way, Boruta-fru can substantially outperform it, being typically anywhere from a few time to several thousand times faster.
-The plot below illustrates this difference for 2 datasets.
+Borutapy is the first implementation of Boruta for Python, and is a part of scikit-learn contrib.
+The default choice for this implementation is using the scikit version of the Random Forest, which proofed to be slower than
+the fru package.
+This way, Boruta-fru can substantially outperform Borutapy, being typically anywhere from a few time to several thousand times faster.
+The plot below illustrates this difference for 3 datasets.
 
-TODO PLOTS
+![Compare to borutapy](https://raw.githubusercontent.com/kpiwonski/boruta-fru/refs/heads/main/plt_cmp_borutapy.png)
 
 Moreover, borutapy introduces several differences from the R package that may influence the results; boruta-fru follows the R package in these regards.
 In particular, boruta-py:
-- uses Gini importance, while it should default to permutation importance;
+- defaults to scikit Random Forest, which uses Gini importance, while original implementation defaults to the permutation importance;
 - uses FDR correction by default, while it should apply Bonferroni correction;
 - reports only confirmed features, while it should be also possible to distinguish between tentative and rejected ones;
 - uses 0.05 default p-value cutoff, while it should use 0.01.
+- handles missing values with the help of the model (eg. scikit Random Forest), while it should use transdapters
 
 ## Boruta-fru versus R Boruta
 

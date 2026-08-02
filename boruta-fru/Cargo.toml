@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Krzysztof Piwonski <borutaarrow@kpiwonski.com>", "Miron B. Kursa <m@mbq.me>"]
 edition="2024"
 license = "GPL-3.0-or-later"
+readme = "../README.md"
+keywords = ["machine-learning", "ml", "random-forest", "decision-tree"]
+categories = ["artificial-intelligence"]
+repository = "https://github.com/kpiwonski/boruta-fru"
 
 [dependencies]
 fru-arrow = "0.1.1"
@@ -13,3 +17,7 @@ xrf = "0.1.7"
 
 [dev-dependencies]
 float-cmp = "0.10.0"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
