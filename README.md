@@ -25,7 +25,8 @@ Thanks to this construction, Boruta is an all relevant method, i.e., it doesn't 
 
 ## Boruta-fru versus borutapy
 
-Borutapy is the first implementation of Boruta for Python, and is a part of scikit-learn contrib; it uses, by default, the scikit version of Random Forest, which is noticably slower than fru.
+Borutapy is the first implementation of Boruta for Python, and is a part of scikit-learn contrib.
+Its default backend is scikit-learn's Random Forest implementation, whereas fru provides a noticeably faster alternative.
 This way, Boruta-fru can substantially outperform Borutapy, being typically anywhere from a few time to several thousand times faster.
 The plot below illustrates this difference for 3 datasets.
 

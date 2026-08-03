@@ -14,7 +14,7 @@ For this tutorial, you will also need ``scikit-learn``, ``pandas`` and ``polars`
 Basic usage example
 -------------------
 You can initialize a model and use the ``fit`` and ``final_decision`` functions.
-The fit function is used to perform feature selection. After running ``fit```, the ``final_decision``
+The fit function is used to perform feature selection. After running ``fit``, the ``final_decision``
 function returns a decision for each feature. The model accepts a ``max_runs`` parameter during initialization.
 If there are many ``Tentative`` decisions, increasing this parameter may help.
 Additionally, increasing the number of ``trees`` may improve the quality of the decisions.
@@ -51,7 +51,7 @@ Additionally, increasing the number of ``trees`` may improve the quality of the 
 
 The result of ``final_decision`` is an array containing a decision for each column in the original data frame.
 
-- ``Confirmed``` means the feature was accepted as important for prediction.
+- ``Confirmed`` means the feature was accepted as important for prediction.
 - ``Rejected`` means the feature was determined not to be important for prediction.
 - ``Tentative`` means the feature was neither rejected nor confirmed; therefore, it is unclear whether the feature should be considered important for prediction.
 
