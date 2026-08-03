@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Krzysztof Piwonski <borutaarrow@kpiwonski.com>", "Miron B. Kursa <m@mbq.me>"]
 edition="2024"
 license = "GPL-3.0-or-later"
+description = "Fast and canonical implementation of Boruta"
 readme = "../README.md"
 keywords = ["machine-learning", "ml", "random-forest", "decision-tree"]
 categories = ["artificial-intelligence"]
