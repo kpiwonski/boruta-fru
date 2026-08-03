@@ -88,7 +88,7 @@ pub fn boruta(
         }
 
         info!(
-            "Boruta iteration: {run}/{max_runs}. Tentative: {} Rejected: {} Confirmed: {}",
+            "Boruta iteration: {run}/{max_runs}. Undecided: {}, Rejected: {}, Confirmed: {}",
             hits.iter()
                 .filter(|h| h.decision == Decision::Tentative)
                 .count(),
@@ -197,6 +197,19 @@ pub fn boruta(
             hits[idx].decide(tentative_idxs.len(), pval_th);
         }
     }
+
+    info!(
+        "Boruta finished with: Tentative: {}, Rejected: {}, Confirmed: {}",
+        hits.iter()
+            .filter(|h| h.decision == Decision::Tentative)
+            .count(),
+        hits.iter()
+            .filter(|h| h.decision == Decision::Rejected)
+            .count(),
+        hits.iter()
+            .filter(|h| h.decision == Decision::Confirmed)
+            .count()
+    );
 
     hits.into_iter().enumerate()
 }
