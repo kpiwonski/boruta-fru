@@ -2,7 +2,7 @@
 name = "boruta-fru"
 version = "0.1.0"
 license = "GPL-3.0-or-later"
-description = "Fast implementation of Boruta using pyfru"
+description = "Fast and canonical implementation of Boruta"
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.0.0",
