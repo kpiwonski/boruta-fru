@@ -129,6 +129,10 @@ message is emitted containing the iteration number and the counts of
 ``Tentative``, ``Rejected``, and ``Confirmed`` features.To enable logging,
 you just need to change log level to info.
 
+.. warning::
+    To make logging work, set the level to ``INFO`` before calling ``boruta.fit`` for the first time.
+
+
 .. code-block:: python
 
     import logging

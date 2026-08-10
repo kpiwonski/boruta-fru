@@ -11,7 +11,7 @@ all-relevant feature selection algorithm for Python.
 This package is coauthored by the original [R package](https://cran.r-project.org/web/packages/Boruta/index.html)
 author Miron Kursa, with a goal to resemble the original implementation as close as possible.
 
-Boruta-fru is built around [fru](github.com/kpiwonski/fru-arrow), a scalable Random Forest implementation featuring a novel, [highly-optimised algorithm](https://dx.doi.org/10.2139/ssrn.6864991) for calculating permutational importance; this way it doesn't need to compromise on using Gini importance for speed.
+Boruta-fru is built around [fru](github.com/kpiwonski/fru-arrow), a scalable Random Forest implementation featuring a novel, [highly-optimised algorithm](https://doi.org/10.1016/j.softx.2026.102918) for calculating permutational importance; this way it doesn't need to compromise on using Gini importance for speed.
 By using the [Arrow PyCapsule](https://arrow.apache.org/docs/format/CDataInterface/PyCapsuleInterface.html) underneath, it flawlessly integrates with any data frame library that supports it; that includes ``polars``, ``pandas`` and ``pyarrow``.
 
 
