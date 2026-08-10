@@ -10,7 +10,7 @@ dependencies = [
 ]
 readme = "README.md"
 authors = [
-    { name = "Chris Piwonski", email = "borutaarrow@kpiwonski.com" },
+    { name = "Chris Piwonski", email = "borutafru@kpiwonski.com" },
     { name = "Miron B. Kursa", email = "m@mbq.me" },
 ]
 classifiers = [
@@ -26,8 +26,8 @@ classifiers = [
 ]
 
 [project.urls]
-repository = "https://github.com/kpiwonski/boruta-arrow"
-documentation = "https://kpiwonski.github.io/boruta-arrow/"
+repository = "https://github.com/kpiwonski/boruta-fru"
+documentation = "https://kpiwonski.github.io/boruta-fru"
 
 [project.optional-dependencies]
 dev = [

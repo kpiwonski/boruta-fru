@@ -1,7 +1,7 @@
 [package]
 name = "boruta-fru"
 version = "0.1.0"
-authors = ["Krzysztof Piwonski <borutaarrow@kpiwonski.com>", "Miron B. Kursa <m@mbq.me>"]
+authors = ["Krzysztof Piwonski <borutafru@kpiwonski.com>", "Miron B. Kursa <m@mbq.me>"]
 edition="2024"
 license = "GPL-3.0-or-later"
 description = "Fast and canonical implementation of Boruta"
